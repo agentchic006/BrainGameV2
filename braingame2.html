@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Trauma & the Brain — Interactive (Educational)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; line-height: 1.4; }
+    .wrap { display: grid; grid-template-columns: 280px 1fr 360px; gap: 18px; align-items: start; }
+    .card { border: 1px solid #ddd; border-radius: 14px; padding: 14px; background: #fff; }
+    .title { font-weight: 800; font-size: 18px; margin-bottom: 10px; }
+    .note { font-size: 12px; color: #555; }
+    .small { font-size: 13px; color: #333; }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 11px 12px;
+      margin: 8px 0;
+      border-radius: 12px;
+      border: 1px solid #bbb;
+      cursor: pointer;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      transition: transform 120ms ease, opacity 120ms ease;
+    }
+    .btn:hover { opacity: 0.94; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0px) scale(0.99); }
+
+    .tag { font-weight: 700; font-size: 12px; opacity: 0.85; }
+    .btn-dv { background: #ffe7ea; border-color: #f0b7bf; }
+    .btn-chronic { background: #ffeede; border-color: #f1c39a; }
+    .btn-acute { background: #e7f0ff; border-color: #a9c1ef; }
+    .btn-support { background: #eaffea; border-color: #a9d7a9; }
+    .btn-reset { background: #f2f2f2; border-color: #cfcfcf; }
+
+    /* Brain area + soft pink tint */
+    .brainArea { height: 440px; display:flex; justify-content:center; align-items:center; }
+    .brainFrame{
+      width: 100%;
+      max-width: 560px;
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(255, 192, 203, 0.18); /* soft pink tint */
+      border: 1px solid rgba(200,200,200,0.6);
+    }
+    svg { width: 100%; height: auto; display:block; }
+
+    /* Region base */
+    .region { transform-origin: center; transition: transform 420ms ease, opacity 420ms ease, filter 420ms ease; }
+    .label { font-size: 13px; fill: #222; font-weight: 700; }
+    .baseline { opacity: 0.9; }
+
+    /* Stronger effects */
+    .shrink { transform: scale(0.78); opacity: 0.55; }
+    .dim    { opacity: 0.40; }
+    .boost  { transform: scale(1.22); opacity: 0.98; filter: drop-shadow(0 0 12px rgba(0,0,0,0.25)); }
+    .focus  { filter: drop-shadow(0 0 16px rgba(0,0,0,0.25)); opacity: 1; }
+
+    /* Punchier pulse for “hyper-reactive” */
+    @keyframes pulse {
+      0%   { transform: scale(1.10); }
+      50%  { transform: scale(1.32); }
+      100% { transform: scale(1.10); }
+    }
+    .pulse { animation: pulse 780ms ease-in-out infinite; opacity: 1; filter: drop-shadow(0 0 12px rgba(0,0,0,0.25)); }
+
+    ul { margin: 8px 0 0 18px; }
+    hr { border: none; border-top: 1px solid #eee; margin: 12px 0; }
+
+    .row { display:flex; gap: 10px; align-items:center; justify-content: space-between; }
+    .toggle { display:flex; align-items:center; gap: 8px; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h2>Trauma & the Brain — Interactive (Simplified Educational Model)</h2>
+  <p class="note">
+    This visualization is simplified and educational. “Shrink / boost / pulse” indicates commonly reported associations in research,
+    not a literal medical measurement for an individual.
+  </p>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="title">Choose an experience</div>
+
+      <button class="btn btn-dv" onclick="applyScenario('dv')">
+        <span><b>Domestic violence</b></span>
+        <span class="tag">threat + regulation</span>
+      </button>
+
+      <button class="btn btn-chronic" onclick="applyScenario('chronic')">
+        <span><b>Chronic stress</b></span>
+        <span class="tag">wear + tear</span>
+      </button>
+
+      <button class="btn btn-acute" onclick="applyScenario('acute')">
+        <span><b>Acute trauma</b></span>
+        <span class="tag">alarm spike</span>
+      </button>
+
+      <button class="btn btn-support" onclick="applyScenario('support')">
+        <span><b>Safety + support</b></span>
+        <span class="tag">protective</span>
+      </button>
+
+      <button class="btn btn-reset" onclick="resetAll()">
+        <span><b>Reset</b></span>
+        <span class="tag">baseline</span>
+      </button>
+
+      <hr />
+
+      <div class="row">
+        <div class="toggle">
+          <input id="soundToggle" type="checkbox" checked />
+          <label for="soundToggle"><b>Sound effects</b></label>
+        </div>
+        <div class="note">Tip: click once anywhere if sounds don’t play.</div>
+      </div>
+
+      <p class="note">
+        Start small: 4 regions + 4 buttons is already a strong capstone demo.
+      </p>
+    </div>
+
+    <div class="card brainArea">
+      <div class="brainFrame">
+        <svg viewBox="0 0 600 420" role="img" aria-label="Simplified brain diagram with labeled regions">
+          <!-- Brain outline (simple blob) -->
+          <path d="M130,210
+                   C130,120 210,70 290,85
+                   C320,50 420,55 455,115
+                   C520,125 540,210 505,255
+                   C520,320 445,370 370,340
+                   C330,380 240,370 210,320
+                   C160,320 130,275 130,210 Z"
+                fill="#f7f7f7" stroke="#cfcfcf" stroke-width="3" />
+
+          <!-- Regions: circles are fine for MVP -->
+          <g id="amygdala" class="region baseline">
+            <circle cx="360" cy="240" r="30" fill="#ff9aa2" />
+            <text x="398" y="245" class="label">Amygdala</text>
+          </g>
+
+          <g id="hippocampus" class="region baseline">
+            <circle cx="310" cy="270" r="28" fill="#9ad0ff" />
+            <text x="90" y="285" class="label">Hippocampus</text>
+          </g>
+
+          <g id="pfc" class="region baseline">
+            <circle cx="260" cy="150" r="34" fill="#9cf0a8" />
+            <text x="90" y="155" class="label">Prefrontal Cortex (PFC)</text>
+          </g>
+
+          <g id="broca" class="region baseline">
+            <circle cx="220" cy="210" r="26" fill="#ffd56a" />
+            <text x="90" y="215" class="label">Broca’s area</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="title" id="scenarioTitle">Baseline</div>
+      <div class="small" id="scenarioDesc">
+        Click a button to see a simplified visualization of brain-related associations reported in trauma/stress research.
+      </div>
+      <div id="effects"></div>
+
+      <hr />
+
+      <details>
+        <summary><b>Sources (add yours here)</b></summary>
+        <p class="note">
+          Add 3–6 citations here for your capstone. You can cite <i>The Body Keeps the Score</i> and a few review articles
+          (PTSD neurobiology, stress/hippocampus, PFC regulation, etc.).
+        </p>
+      </details>
+    </div>
+  </div>
+
+  <script>
+    const el = {
+      amygdala: document.getElementById('amygdala'),
+      hippocampus: document.getElementById('hippocampus'),
+      pfc: document.getElementById('pfc'),
+      broca: document.getElementById('broca'),
+      title: document.getElementById('scenarioTitle'),
+      desc: document.getElementById('scenarioDesc'),
+      effects: document.getElementById('effects'),
+      soundToggle: document.getElementById('soundToggle'),
+    };
+
+    // --- Sound (no audio files). Browser-generated tones. ---
+    let audioCtx = null;
+
+    function soundOn() {
+      return !!el.soundToggle?.checked;
+    }
+
+    function ensureAudio() {
+      if (!soundOn()) return null;
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playTone(freq = 440, durationMs = 120, type = 'sine', gainVal = 0.05) {
+      const ctx = ensureAudio();
+      if (!ctx) return;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = type;
+      osc.frequency.value = freq;
+
+      const now = ctx.currentTime;
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(gainVal, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + durationMs / 1000);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + durationMs / 1000);
+    }
+
+    // Scenario SFX palettes
+    function sfxScenario(type) {
+      if (!soundOn()) return;
+      if (type === 'dv') {
+        playTone(220, 90, 'sawtooth', 0.045);
+        setTimeout(() => playTone(180, 120, 'sawtooth', 0.045), 90);
+      } else if (type === 'chronic') {
+        playTone(260, 130, 'triangle', 0.04);
+        setTimeout(() => playTone(240, 130, 'triangle', 0.04), 120);
+      } else if (type === 'acute') {
+        playTone(520, 70, 'square', 0.04);
+        setTimeout(() => playTone(420, 90, 'square', 0.04), 70);
+      } else if (type === 'support') {
+        playTone(440, 90, 'sine', 0.04);
+        setTimeout(() => playTone(660, 110, 'sine', 0.04), 90);
+      } else if (type === 'reset') {
+        playTone(330, 60, 'sine', 0.03);
+      }
+    }
+
+    // Autounlock hint: some browsers require a click before audio
+    document.addEventListener('pointerdown', () => ensureAudio(), { once: true });
+
+    function resetClasses(node) {
+      node.className = 'region baseline';
+    }
+
+    function resetAll(){
+      resetClasses(el.amygdala);
+      resetClasses(el.hippocampus);
+      resetClasses(el.pfc);
+      resetClasses(el.broca);
+
+      el.title.textContent = 'Baseline';
+      el.desc.textContent = 'Click a button to see a simplified visualization of brain-related associations reported in trauma/stress research.';
+      el.effects.innerHTML = '';
+      sfxScenario('reset');
+    }
+
+    function setEffects(list){
+      el.effects.innerHTML = '<ul>' + list.map(x => `<li>${x}</li>`).join('') + '</ul>';
+    }
+
+    function applyScenario(type){
+      resetAll();
+      // resetAll already played reset SFX; for scenario, play scenario SFX after reset
+      // (So it feels like a distinct click response.)
+      sfxScenario(type);
+
+      if (type === 'dv') {
+        el.title.textContent = 'Domestic violence (illustrative)';
+        el.desc.textContent = 'Pattern: heightened alarm + reduced regulation and context/memory support.';
+        el.amygdala.classList.add('pulse');      // hyper-reactive
+        el.hippocampus.classList.add('shrink');  // reduced volume/function (illustrative)
+        el.pfc.classList.add('shrink');          // reduced top-down regulation (illustrative)
+        el.broca.classList.add('dim');           // harder to verbalize during recall (illustrative)
+        setEffects([
+          '<b>Amygdala</b>: threat detection may become more reactive (hypervigilance).',
+          '<b>Hippocampus</b>: stress can impair context/memory processing.',
+          '<b>PFC</b>: regulation/impulse control can be harder under chronic threat.',
+          '<b>Broca’s area</b>: speech access can drop during trauma recall (“speechless terror”).'
+        ]);
+      }
+
+      if (type === 'chronic') {
+        el.title.textContent = 'Chronic stress';
+        el.desc.textContent = 'Pattern: prolonged stress load affects regulation and memory systems over time.';
+        el.amygdala.classList.add('boost');
+        el.hippocampus.classList.add('shrink');
+        el.pfc.classList.add('shrink');
+        setEffects([
+          '<b>Amygdala</b>: may become more sensitive to perceived threat.',
+          '<b>Hippocampus</b>: prolonged stress is associated with reduced volume/function in many studies.',
+          '<b>PFC</b>: sustained stress can reduce focus, flexibility, and emotional regulation.'
+        ]);
+      }
+
+      if (type === 'acute') {
+        el.title.textContent = 'Acute trauma (single event)';
+        el.desc.textContent = 'Pattern: immediate alarm response; regulation and speech can temporarily dip.';
+        el.amygdala.classList.add('pulse');
+        el.pfc.classList.add('dim');
+        el.broca.classList.add('dim');
+        setEffects([
+          '<b>Amygdala</b>: strong alarm response (fight/flight).',
+          '<b>PFC</b>: can go “offline” temporarily during high arousal.',
+          '<b>Broca’s area</b>: speech access may decrease during intense recall.'
+        ]);
+      }
+
+      if (type === 'support') {
+        el.title.textContent = 'Safety + support (protective)';
+        el.desc.textContent = 'Pattern: regulation strengthens; alarm response can calm with sustained safety.';
+        el.pfc.classList.add('boost');
+        el.amygdala.classList.add('dim'); // calming
+        setEffects([
+          '<b>PFC</b>: improved regulation with safety, skills, therapy, sleep, and support.',
+          '<b>Amygdala</b>: threat response can calm with sustained safety.',
+          '<b>Hippocampus</b>: functioning can improve with reduced stress load and stability.'
+        ]);
+      }
+    }
+
+    // Start baseline
+    resetAll();
+  </script>
+</body>
+</html>
