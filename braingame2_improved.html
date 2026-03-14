@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Trauma & the Brain — Interactive (Educational)</title>
+  <style>
+    :root {
+      --bg: #f6f4f8;
+      --card: rgba(255,255,255,0.84);
+      --card-border: rgba(181, 170, 190, 0.28);
+      --ink: #201a22;
+      --muted: #5a5060;
+      --panel: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(249,244,250,0.9));
+      --brain-tint: linear-gradient(180deg, rgba(255,229,236,0.55), rgba(255,243,247,0.82));
+      --shadow: 0 16px 36px rgba(65, 39, 74, 0.08);
+      --amygdala: #ff8f9a;
+      --hippocampus: #8ec8ff;
+      --pfc: #85e29a;
+      --broca: #ffd26a;
+      --baseline-opacity: 0.92;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 28px;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      line-height: 1.45;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 222, 236, 0.55), transparent 28%),
+        radial-gradient(circle at top right, rgba(222, 237, 255, 0.4), transparent 24%),
+        linear-gradient(180deg, #fbf8fc 0%, var(--bg) 100%);
+      transition: background 260ms ease;
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .note { font-size: 12px; color: var(--muted); }
+    .small { font-size: 15px; color: #2f2833; }
+
+    .wrap {
+      display: grid;
+      grid-template-columns: 300px 1fr 380px;
+      gap: 20px;
+      align-items: start;
+      margin-top: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      padding: 18px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .title {
+      font-weight: 800;
+      font-size: 20px;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px 14px;
+      margin: 10px 0;
+      border-radius: 16px;
+      border: 1px solid #bbb;
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: 0.2px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      transition: transform 140ms ease, box-shadow 180ms ease, opacity 140ms ease;
+      box-shadow: 0 6px 14px rgba(30, 20, 35, 0.05);
+    }
+    .btn:hover { opacity: 0.98; transform: translateY(-2px); box-shadow: 0 10px 18px rgba(30, 20, 35, 0.09); }
+    .btn:active { transform: translateY(0) scale(0.99); }
+    .tag { font-weight: 700; font-size: 12px; opacity: 0.88; }
+    .btn-dv { background: linear-gradient(180deg, #ffe9ed, #ffdce3); border-color: #f0b7bf; }
+    .btn-chronic { background: linear-gradient(180deg, #fff0e1, #ffe5cf); border-color: #f1c39a; }
+    .btn-acute { background: linear-gradient(180deg, #ecf3ff, #dbe9ff); border-color: #a9c1ef; }
+    .btn-support { background: linear-gradient(180deg, #ebffeb, #d8f6dc); border-color: #a9d7a9; }
+    .btn-reset { background: linear-gradient(180deg, #f6f6f7, #ececef); border-color: #cfcfcf; }
+
+    .brainArea {
+      min-height: 500px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .brainFrame {
+      width: 100%;
+      max-width: 700px;
+      border-radius: 28px;
+      padding: 18px;
+      background: var(--brain-tint);
+      border: 1px solid rgba(200,200,200,0.5);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 12px 28px rgba(55, 38, 70, 0.06);
+    }
+
+    svg { width: 100%; height: auto; display: block; }
+
+    .outline {
+      fill: #f5f5f6;
+      stroke: #c9c9cf;
+      stroke-width: 4;
+      filter: drop-shadow(0 8px 12px rgba(60, 50, 70, 0.06));
+    }
+
+    .region {
+      transform-box: fill-box;
+      transform-origin: center;
+      transition: transform 260ms ease, opacity 260ms ease, filter 260ms ease;
+    }
+
+    .region circle {
+      transition: r 260ms ease, opacity 260ms ease, filter 260ms ease, stroke 260ms ease, stroke-width 260ms ease;
+      stroke: rgba(255,255,255,0.78);
+      stroke-width: 2;
+    }
+
+    .label {
+      font-size: 14px;
+      fill: #2b262f;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      transition: opacity 260ms ease, fill 260ms ease;
+    }
+
+    .baseline { opacity: var(--baseline-opacity); filter: none; }
+    .baseline .label { opacity: 0.9; }
+
+    .shrink {
+      transform: scale(0.6);
+      opacity: 0.3;
+      filter: saturate(0.82);
+    }
+    .shrink .label { opacity: 0.42; }
+    .shrink circle { filter: none; }
+
+    .dim {
+      transform: scale(0.72);
+      opacity: 0.34;
+      filter: saturate(0.78);
+    }
+    .dim .label { opacity: 0.44; }
+
+    .boost {
+      transform: scale(1.55);
+      opacity: 1;
+      filter: drop-shadow(0 0 18px rgba(22, 20, 28, 0.18));
+    }
+    .boost .label { opacity: 1; fill: #171319; }
+    .boost circle {
+      stroke: rgba(255,255,255,0.96);
+      stroke-width: 3;
+      filter: drop-shadow(0 0 18px rgba(0,0,0,0.16));
+    }
+
+    .focus {
+      transform: scale(1.18);
+      opacity: 1;
+      filter: drop-shadow(0 0 20px rgba(22, 20, 28, 0.16));
+    }
+    .focus circle {
+      stroke: rgba(255,255,255,0.96);
+      stroke-width: 3;
+      filter: drop-shadow(0 0 18px rgba(0,0,0,0.18));
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 0 rgba(255,120,130,0));
+      }
+      50% {
+        transform: scale(1.52);
+        filter: drop-shadow(0 0 18px rgba(255,120,130,0.38));
+      }
+      100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 0 rgba(255,120,130,0));
+      }
+    }
+
+    .pulse {
+      animation: pulse 900ms ease-in-out infinite;
+      opacity: 1;
+    }
+    .pulse .label { opacity: 1; fill: #171319; }
+    .pulse circle {
+      stroke: rgba(255,255,255,0.98);
+      stroke-width: 3.5;
+      filter: drop-shadow(0 0 18px rgba(0,0,0,0.18));
+    }
+
+    .legend-pill {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(180,170,190,0.25);
+      color: #453b4b;
+    }
+
+    .right h3 {
+      margin: 0 0 10px;
+      font-size: 1.1rem;
+    }
+
+    ul { margin: 10px 0 0 20px; padding: 0; }
+    li { margin-bottom: 8px; }
+    hr { border: none; border-top: 1px solid rgba(140,130,150,0.14); margin: 14px 0; }
+    .row { display:flex; gap: 10px; align-items:center; justify-content: space-between; }
+    .toggle { display:flex; align-items:center; gap: 8px; font-size: 13px; }
+
+    @media (max-width: 1200px) {
+      .wrap { grid-template-columns: 1fr; }
+      .brainArea { min-height: 420px; }
+    }
+  </style>
+</head>
+<body>
+  <h2>Trauma & the Brain — Interactive (Simplified Educational Model)</h2>
+  <p class="note">
+    This visualization is simplified and educational. “Shrink / boost / pulse” indicates commonly reported associations in research,
+    not a literal medical measurement for an individual.
+  </p>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="title">Choose an experience</div>
+
+      <button class="btn btn-dv" onclick="applyScenario('dv')">
+        <span><b>Domestic violence</b></span>
+        <span class="tag">threat + regulation</span>
+      </button>
+
+      <button class="btn btn-chronic" onclick="applyScenario('chronic')">
+        <span><b>Chronic stress</b></span>
+        <span class="tag">wear + tear</span>
+      </button>
+
+      <button class="btn btn-acute" onclick="applyScenario('acute')">
+        <span><b>Acute trauma</b></span>
+        <span class="tag">alarm spike</span>
+      </button>
+
+      <button class="btn btn-support" onclick="applyScenario('support')">
+        <span><b>Safety + support</b></span>
+        <span class="tag">protective</span>
+      </button>
+
+      <button class="btn btn-reset" onclick="resetAll()">
+        <span><b>Reset</b></span>
+        <span class="tag">baseline</span>
+      </button>
+
+      <hr />
+
+      <div class="row">
+        <div class="toggle">
+          <input id="soundToggle" type="checkbox" checked />
+          <label for="soundToggle"><b>Sound effects</b></label>
+        </div>
+        <div class="note">Tip: click once anywhere if sounds don’t play.</div>
+      </div>
+
+      <p class="note">
+        Strong visual language: amygdala pulses, other regions grow or shrink based on the selected experience.
+      </p>
+    </div>
+
+    <div class="card brainArea">
+      <div class="brainFrame">
+        <svg viewBox="0 0 700 460" role="img" aria-label="Simplified brain diagram with labeled regions">
+          <path class="outline" d="M150,225
+                   C150,125 236,70 325,85
+                   C358,48 468,58 507,124
+                   C577,136 599,225 560,276
+                   C576,347 494,399 410,365
+                   C365,407 264,394 230,337
+                   C175,337 150,288 150,225 Z" />
+
+          <g id="amygdala" class="region baseline">
+            <circle cx="420" cy="248" r="34" fill="var(--amygdala)" />
+            <text x="468" y="254" class="label">Amygdala</text>
+          </g>
+
+          <g id="hippocampus" class="region baseline">
+            <circle cx="345" cy="286" r="28" fill="var(--hippocampus)" />
+            <text x="120" y="302" class="label">Hippocampus</text>
+          </g>
+
+          <g id="pfc" class="region baseline">
+            <circle cx="284" cy="150" r="38" fill="var(--pfc)" />
+            <text x="70" y="158" class="label">Prefrontal Cortex (PFC)</text>
+          </g>
+
+          <g id="broca" class="region baseline">
+            <circle cx="245" cy="205" r="29" fill="var(--broca)" />
+            <text x="118" y="212" class="label">Broca’s area</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="card right">
+      <div class="title" id="scenarioTitle">Baseline</div>
+      <div class="small" id="scenarioDesc">
+        Click a button to see a simplified visualization of brain-related associations reported in trauma/stress research.
+      </div>
+      <div class="legend-pill" id="scenarioBadge">Neutral view</div>
+      <div id="effects"></div>
+
+      <hr />
+
+      <details>
+        <summary><b>Sources (add yours here)</b></summary>
+        <p class="note">
+          Add your capstone sources here. This can include <i>The Body Keeps the Score</i> and review articles on PTSD neurobiology,
+          stress and the hippocampus, PFC regulation, and trauma recall.
+        </p>
+      </details>
+    </div>
+  </div>
+
+  <script>
+    const el = {
+      amygdala: document.getElementById('amygdala'),
+      hippocampus: document.getElementById('hippocampus'),
+      pfc: document.getElementById('pfc'),
+      broca: document.getElementById('broca'),
+      title: document.getElementById('scenarioTitle'),
+      desc: document.getElementById('scenarioDesc'),
+      effects: document.getElementById('effects'),
+      badge: document.getElementById('scenarioBadge'),
+      soundToggle: document.getElementById('soundToggle'),
+    };
+
+    let audioCtx = null;
+
+    function soundOn() {
+      return !!el.soundToggle?.checked;
+    }
+
+    function ensureAudio() {
+      if (!soundOn()) return null;
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playTone(freq = 440, durationMs = 120, type = 'sine', gainVal = 0.05) {
+      const ctx = ensureAudio();
+      if (!ctx) return;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+
+      const now = ctx.currentTime;
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(gainVal, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + durationMs / 1000);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + durationMs / 1000);
+    }
+
+    function sfxScenario(type) {
+      if (!soundOn()) return;
+      if (type === 'dv') {
+        playTone(220, 90, 'sawtooth', 0.045);
+        setTimeout(() => playTone(180, 130, 'sawtooth', 0.045), 85);
+      } else if (type === 'chronic') {
+        playTone(260, 130, 'triangle', 0.04);
+        setTimeout(() => playTone(235, 150, 'triangle', 0.04), 110);
+      } else if (type === 'acute') {
+        playTone(520, 70, 'square', 0.04);
+        setTimeout(() => playTone(430, 100, 'square', 0.04), 70);
+      } else if (type === 'support') {
+        playTone(440, 90, 'sine', 0.04);
+        setTimeout(() => playTone(680, 120, 'sine', 0.04), 90);
+      } else if (type === 'reset') {
+        playTone(330, 60, 'sine', 0.03);
+      }
+    }
+
+    document.addEventListener('pointerdown', () => ensureAudio(), { once: true });
+
+    const allRegions = [el.amygdala, el.hippocampus, el.pfc, el.broca];
+
+    function resetClasses(node) {
+      node.className.baseVal = 'region baseline';
+    }
+
+    function setBackground(mode = 'baseline') {
+      if (mode === 'dv') {
+        document.body.style.background = 'radial-gradient(circle at top left, rgba(255, 205, 215, 0.62), transparent 28%), radial-gradient(circle at top right, rgba(239, 228, 255, 0.34), transparent 24%), linear-gradient(180deg, #fff7f9 0%, #f7f1f5 100%)';
+      } else if (mode === 'chronic') {
+        document.body.style.background = 'radial-gradient(circle at top left, rgba(255, 228, 198, 0.5), transparent 28%), radial-gradient(circle at top right, rgba(226, 233, 255, 0.28), transparent 24%), linear-gradient(180deg, #fff9f4 0%, #f5f2ef 100%)';
+      } else if (mode === 'acute') {
+        document.body.style.background = 'radial-gradient(circle at top left, rgba(220, 233, 255, 0.56), transparent 28%), radial-gradient(circle at top right, rgba(255, 224, 232, 0.3), transparent 24%), linear-gradient(180deg, #f7fbff 0%, #eff4fb 100%)';
+      } else if (mode === 'support') {
+        document.body.style.background = 'radial-gradient(circle at top left, rgba(223, 255, 228, 0.55), transparent 28%), radial-gradient(circle at top right, rgba(227, 243, 255, 0.24), transparent 24%), linear-gradient(180deg, #f9fff9 0%, #eef6f0 100%)';
+      } else {
+        document.body.style.background = 'radial-gradient(circle at top left, rgba(255, 222, 236, 0.55), transparent 28%), radial-gradient(circle at top right, rgba(222, 237, 255, 0.4), transparent 24%), linear-gradient(180deg, #fbf8fc 0%, #f6f4f8 100%)';
+      }
+    }
+
+    function resetAll(playReset = true) {
+      allRegions.forEach(resetClasses);
+      el.title.textContent = 'Baseline';
+      el.desc.textContent = 'Click a button to see a simplified visualization of brain-related associations reported in trauma/stress research.';
+      el.badge.textContent = 'Neutral view';
+      el.effects.innerHTML = '';
+      setBackground('baseline');
+      if (playReset) sfxScenario('reset');
+    }
+
+    function setEffects(list) {
+      el.effects.innerHTML = '<ul>' + list.map(x => `<li>${x}</li>`).join('') + '</ul>';
+    }
+
+    function emphasize(region, mode) {
+      region.classList.add(mode);
+    }
+
+    function applyScenario(type) {
+      resetAll(false);
+      sfxScenario(type);
+      setBackground(type);
+
+      if (type === 'dv') {
+        el.title.textContent = 'Domestic violence (illustrative)';
+        el.desc.textContent = 'Pattern: heightened alarm + reduced regulation and context or memory support.';
+        el.badge.textContent = 'Threat pattern';
+        emphasize(el.amygdala, 'pulse');
+        emphasize(el.hippocampus, 'shrink');
+        emphasize(el.pfc, 'shrink');
+        emphasize(el.broca, 'dim');
+        setEffects([
+          '<b>Amygdala</b>: threat detection may become more reactive and hypervigilant.',
+          '<b>Hippocampus</b>: stress can impair context and memory processing.',
+          '<b>PFC</b>: top-down regulation and impulse control can become harder under chronic threat.',
+          '<b>Broca’s area</b>: speech access can drop during trauma recall.'
+        ]);
+      }
+
+      if (type === 'chronic') {
+        el.title.textContent = 'Chronic stress';
+        el.desc.textContent = 'Pattern: prolonged stress load affects regulation and memory systems over time.';
+        el.badge.textContent = 'Wear + tear';
+        emphasize(el.amygdala, 'focus');
+        emphasize(el.hippocampus, 'shrink');
+        emphasize(el.pfc, 'shrink');
+        setEffects([
+          '<b>Amygdala</b>: may become more sensitive to perceived threat over time.',
+          '<b>Hippocampus</b>: prolonged stress is associated with reduced volume or function in many studies.',
+          '<b>PFC</b>: sustained stress can reduce focus, flexibility, and emotional regulation.'
+        ]);
+      }
+
+      if (type === 'acute') {
+        el.title.textContent = 'Acute trauma (single event)';
+        el.desc.textContent = 'Pattern: immediate alarm response; regulation and speech can temporarily dip.';
+        el.badge.textContent = 'Alarm spike';
+        emphasize(el.amygdala, 'pulse');
+        emphasize(el.pfc, 'dim');
+        emphasize(el.broca, 'shrink');
+        setEffects([
+          '<b>Amygdala</b>: strong alarm response linked to fight, flight, or freeze.',
+          '<b>PFC</b>: can go more offline temporarily during high arousal.',
+          '<b>Broca’s area</b>: speech access may decrease during intense recall.'
+        ]);
+      }
+
+      if (type === 'support') {
+        el.title.textContent = 'Safety + support (protective)';
+        el.desc.textContent = 'Pattern: regulation strengthens; alarm response can calm with sustained safety.';
+        el.badge.textContent = 'Protective pattern';
+        emphasize(el.pfc, 'boost');
+        emphasize(el.hippocampus, 'focus');
+        emphasize(el.amygdala, 'dim');
+        setEffects([
+          '<b>PFC</b>: regulation can strengthen with safety, skills, therapy, sleep, and support.',
+          '<b>Amygdala</b>: threat response can calm with sustained safety.',
+          '<b>Hippocampus</b>: functioning can improve with reduced stress load and stability.'
+        ]);
+      }
+    }
+
+    resetAll(false);
+  </script>
+</body>
+</html>
